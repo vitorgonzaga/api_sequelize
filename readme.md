@@ -110,5 +110,9 @@
 
   7. Além dos arquivos "models/product.js" e "models/index.js" o commando `npx sequelize model:generate` criou também um arquivo na pasta migrations e nele, em linhas gerais, está contido as instruções/settings que o ORM utilizará para modificar o banco de dados, nesse caso o "db_sequelize";
 
+  8. `npx sequelize-cli db:migrate` para executar a migration criando assim a tabela "Products" no banco de dados "db_sequelize";
+
+
+
 
 
