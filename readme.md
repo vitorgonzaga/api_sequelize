@@ -192,6 +192,8 @@
 
 ## **USE TRANSACTIONS**
 
+https://stackoverflow.com/questions/46357533/how-to-add-delete-new-columns-in-sequelize-cli
+
 Obs: The better way to pass multiple actions (async) in sequelize migration is through transactions. It keeps consistent beetween migrations and database:
 
 Example 1:
