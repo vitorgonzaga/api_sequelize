@@ -189,3 +189,77 @@
         await queryInterface.bulkDelete('Products', null, {});
       },
     };
+
+## **USE TRANSACTIONS**
+
+Obs: The better way to pass multiple actions (async) in sequelize migration is through transactions. It keeps consistent beetween migrations and database:
+
+Example 1:
+
+    module.exports = {
+        up: (queryInterface, Sequelize) => {
+            return queryInterface.sequelize.transaction((t) => {
+                return Promise.all([
+                    queryInterface.addColumn('table_name', 'column_name1', {
+                        type: Sequelize.STRING
+                    }, { transaction: t }),
+                    queryInterface.addColumn('table_name', 'column_name2', {
+                        type: Sequelize.STRING,
+                    }, { transaction: t })
+                ])
+            })
+        },
+
+        down: (queryInterface, Sequelize) => {
+            return queryInterface.sequelize.transaction((t) => {
+                return Promise.all([
+                    queryInterface.removeColumn('table_name', 'column_name1', { transaction: t }),
+                    queryInterface.removeColumn('table_name', 'column_name2', { transaction: t })
+                ])
+            })
+        }
+    };
+
+Example 2:
+
+    module.exports = {
+      up: async (queryInterface, Sequelize) => {
+        const transaction = await queryInterface.sequelize.transaction();
+        try {
+          await queryInterface.addColumn(
+            'Products',
+            'description',
+            {
+              type: Sequelize.STRING,
+            },
+          );
+          await queryInterface.addColumn(
+            'Products',
+            'price',
+            {
+              type: Sequelize.FLOAT,
+            },
+          );
+          await transaction.commit();
+          return Promise.resolve();
+        } catch (error) {
+          if (transaction) await transaction.rollback();
+          return Promise.reject(error);
+        }
+      },
+
+      down: async (queryInterface, Sequelize) => {
+        const transaction = await queryInterface.sequelize.transaction();
+        try {
+          await queryInterface.removeColumn('Products', 'description', { transaction });
+          await queryInterface.removeColumn('Products', 'price', { transaction });
+          await transaction.commit();
+          return Promise.resolve();
+        } catch (error) {
+          if (transaction) {
+            await transaction.rollback();
+          }
+          return Promise.reject(error);
+        }
+      },
+    };
